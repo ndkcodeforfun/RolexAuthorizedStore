@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="ModelView\" />
+    <Folder Include="Mapper\" />
+    <Folder Include="Service\Implement\" />
+    <Folder Include="Service\Interface\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RolexApplication_DAL\RolexApplication_DAL.csproj" />
+  </ItemGroup>
+
+</Project>

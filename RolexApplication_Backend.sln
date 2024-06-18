@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33627.172
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RolexApplication_Backend", "RolexApplication_Backend\RolexApplication_Backend.csproj", "{CDAFB27C-6280-4AA0-8B9C-AF328F751DEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RolexApplication_BAL", "RolexApplication_BAL\RolexApplication_BAL.csproj", "{06961DC4-18C6-4D78-BBC4-1FDD33BD19A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RolexApplication_DAL", "RolexApplication_DAL\RolexApplication_DAL.csproj", "{98322A53-A037-4F94-ADBA-3C5AA06209E0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CDAFB27C-6280-4AA0-8B9C-AF328F751DEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CDAFB27C-6280-4AA0-8B9C-AF328F751DEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CDAFB27C-6280-4AA0-8B9C-AF328F751DEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CDAFB27C-6280-4AA0-8B9C-AF328F751DEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06961DC4-18C6-4D78-BBC4-1FDD33BD19A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06961DC4-18C6-4D78-BBC4-1FDD33BD19A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06961DC4-18C6-4D78-BBC4-1FDD33BD19A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06961DC4-18C6-4D78-BBC4-1FDD33BD19A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98322A53-A037-4F94-ADBA-3C5AA06209E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98322A53-A037-4F94-ADBA-3C5AA06209E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98322A53-A037-4F94-ADBA-3C5AA06209E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98322A53-A037-4F94-ADBA-3C5AA06209E0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9B71DF06-DD87-4B28-BD2E-1F0EF720B857}
+	EndGlobalSection
+EndGlobal
