@@ -1,4 +1,7 @@
 ﻿
+using Microsoft.EntityFrameworkCore;
+using RolexApplication_DAL.Models;
+using RolexApplication_DAL.Repository.Implement.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,82 +11,102 @@ using System.Threading.Tasks;
 
 namespace RolexApplication_DAL.Repository.Implement
 {
-    public class GenericRepository<TEntity> /*: IGenericRepository<TEntity> where TEntity : class*/
+    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
     {
-        //private readonly FUMiniHotelManagementContext _context;
-        //private readonly DbSet<TEntity> dbSet;
+        private readonly RolexAuthorizedStoreDbContext context;
+        private readonly DbSet<TEntity> dbSet;
 
-        //public GenericRepository(FUMiniHotelManagementContext context)
-        //{
-        //    _context = context;
-        //    this.dbSet = context.Set<TEntity>();
-        //}
+        public GenericRepository(RolexAuthorizedStoreDbContext context)
+        {
+            this.context = context;
+            this.dbSet = context.Set<TEntity>();
+        }
 
-        //public void Delete(object id)
-        //{
-        //    TEntity entityToDelete = dbSet.Find(id);
-        //    Delete(entityToDelete);
-        //}
+        public async Task DeleteAsync(object id)
+        {
+            TEntity entityToDelete = await dbSet.FindAsync(id);
+            await DeleteAsync(entityToDelete);
+        }
 
-        //public void Delete(TEntity entityToDelete)
-        //{
-        //    if (_context.Entry(entityToDelete).State == EntityState.Detached)
-        //    {
-        //        dbSet.Attach(entityToDelete);
-        //    }
-        //    dbSet.Remove(entityToDelete);
-        //}
+        public async Task DeleteAsync(TEntity entityToDelete)
+        {
+            if (context.Entry(entityToDelete).State == EntityState.Detached)
+            {
+                dbSet.Attach(entityToDelete);
+            }
+            dbSet.Remove(entityToDelete);
+            await context.SaveChangesAsync();
+        }
 
-        //public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> expression)
-        //{
-        //    return dbSet.Where(expression);
-        //}
+        public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression)
+        {
+            return await dbSet.Where(expression).ToListAsync();
+        }
 
-        //public IEnumerable<TEntity> Get(Expression<Func<TEntity, bool>> filter = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null, string includeProperties = "", int? pageIndex = null, int? pageSize = null)
-        //{
-        //    IQueryable<TEntity> query = dbSet;
+        public virtual async Task<IEnumerable<TEntity>> GetAsync(
+            Expression<Func<TEntity, bool>> filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
+            string includeProperties = "",
+            int? pageIndex = null,
+            int? pageSize = null)
+        {
+            IQueryable<TEntity> query = dbSet;
 
-        //    if (filter != null)
-        //    {
-        //        query = query.Where(filter);
-        //    }
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
 
-        //    foreach (var includeProperty in includeProperties.Split
-        //        (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-        //    {
-        //        query = query.Include(includeProperty);
-        //    }
+            foreach (var includeProperty in includeProperties.Split
+                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(includeProperty);
+            }
 
-        //    if (orderBy != null)
-        //    {
-        //        query = orderBy(query);
-        //    }
-        //    if (pageIndex.HasValue && pageSize.HasValue)
-        //    {
-        //        // Ensure the pageIndex and pageSize are valid
-        //        int validPageIndex = pageIndex.Value > 0 ? pageIndex.Value - 1 : 0;
-        //        int validPageSize = pageSize.Value > 0 ? pageSize.Value : 10; // Assuming a default pageSize of 10 if an invalid value is passed
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
 
-        //        query = query.Skip(validPageIndex * validPageSize).Take(validPageSize);
-        //    }
+            if (pageIndex.HasValue && pageSize.HasValue)
+            {
+                int validPageIndex = pageIndex.Value > 0 ? pageIndex.Value - 1 : 0;
+                int validPageSize = pageSize.Value > 0 ? pageSize.Value : 12;
 
-        //    return query.ToList();
-        //}
+                query = query.Skip(validPageIndex * validPageSize).Take(validPageSize);
+            }
 
-        //public TEntity GetByID(object id)
-        //{
-        //    return dbSet.Find(id);
-        //}
+            return await query.ToListAsync();
+        }
 
-        //public void Insert(TEntity entity)
-        //{
-        //    dbSet.Add(entity);
-        //}
+        public async Task<TEntity> GetByIDAsync(object id)
+        {
+            return await dbSet.FindAsync(id);
+        }
 
-        //public void Update(TEntity entityToUpdate)
-        //{
-        //    dbSet.Attach(entityToUpdate);
-        //    _context.Entry(entityToUpdate).State = EntityState.Modified;
-        //}
+        public async Task InsertAsync(TEntity entity)
+        {
+            await dbSet.AddAsync(entity);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(TEntity entityToUpdate)
+        {
+            dbSet.Attach(entityToUpdate);
+            context.Entry(entityToUpdate).State = EntityState.Modified;
+            await context.SaveChangesAsync();
+        }
+
+        public async Task<int> CountAsync(Expression<Func<TEntity, bool>> filter = null)
+        {
+            IQueryable<TEntity> query = dbSet;
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            return await query.CountAsync();
+        }
     }
 }

@@ -15,10 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\RolexApplication_BAL\RolexApplication_BAL.csproj" />
     <ProjectReference Include="..\RolexApplication_DAL\RolexApplication_DAL.csproj" />
   </ItemGroup>

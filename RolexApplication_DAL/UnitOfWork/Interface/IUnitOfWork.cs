@@ -1,4 +1,6 @@
 ﻿
+using RolexApplication_DAL.Models;
+using RolexApplication_DAL.Repository.Implement.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +12,18 @@ namespace RolexApplication_DAL.UnitOfWork.Interface
     public interface IUnitOfWork
     {
 
-        //IGenericRepository<BookingDetail> BookingDetailRepository { get; }
-        //IGenericRepository<BookingReservation> BookingResercationRepository { get; }
-        //IGenericRepository<Customer> CustomerRepository { get; }
-        //IGenericRepository<RoomInformation> RoomInformationRepository { get; }
-        //IGenericRepository<RoomType> RoomTypeRepository { get; }
-        //void Save();
+        IGenericRepository<Cart> CartRepository { get; }
+        IGenericRepository<CartItem> CartItemRepository { get; }
+        IGenericRepository<Category> CategoryRepository { get; }
+
+        IGenericRepository<Customer> CustomerRepository { get; }
+        IGenericRepository<Order> OrderRepository { get; }
+        IGenericRepository<OrderDetail> OrderDetailRepository { get; }
+
+        IGenericRepository<Product> ProductRepository { get; }
+        IGenericRepository<ProductImage> ProductImageRepository { get; }
+
+
+        Task SaveAsync();
     }
 }

@@ -1,4 +1,8 @@
 ﻿
+using RolexApplication_DAL.Models;
+using RolexApplication_DAL.Repository.Implement;
+using RolexApplication_DAL.Repository.Implement.Interface;
+using RolexApplication_DAL.UnitOfWork.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,51 +11,60 @@ using System.Threading.Tasks;
 
 namespace DAL.UnitOfWork.Implement
 {
-    public class UnitOfWork /*: IUnitOfWork, IDisposable*/
+    public class UnitOfWork : IUnitOfWork, IDisposable
     {
-        //private FUMiniHotelManagementContext context = new FUMiniHotelManagementContext();
-        //private GenericRepository<BookingDetail> _bookingDetailRepository;
-        //private GenericRepository<BookingReservation> _bookingReservationRepository;
-        //private GenericRepository<Customer> _customerRepository;
-        //private GenericRepository<RoomInformation> _roomInformationRepository;
-        //private GenericRepository<RoomType> _roomTypeRepository;
-        //public UnitOfWork(FUMiniHotelManagementContext context)
-        //{
-        //    this.context = context;
-        //}
+        private RolexAuthorizedStoreDbContext context = new RolexAuthorizedStoreDbContext();
+        private GenericRepository<Customer> _customerRepository;
+        private GenericRepository<Cart> _cartRepository;
+        private GenericRepository<CartItem> _cartItemRepository;
+        private GenericRepository<Category> _categoryRepository;
+        private GenericRepository<Order> _orderRepository;
+        private GenericRepository<OrderDetail> _orderDetailRepository;
+        private GenericRepository<Product> _productRepository;
+        private GenericRepository<ProductImage> _productImageRepository;
 
-        //private bool disposed = false;
-        //public IGenericRepository<BookingDetail> BookingDetailRepository => _bookingDetailRepository ?? new GenericRepository<BookingDetail>(context);
 
-        //public IGenericRepository<BookingReservation> BookingResercationRepository => _bookingReservationRepository ?? new GenericRepository<BookingReservation>(context);
+        public UnitOfWork(RolexAuthorizedStoreDbContext context)
+        {
+            this.context = context;
+        }
+        private bool disposed = false;
+        public IGenericRepository<Cart> CartRepository => _cartRepository ?? new GenericRepository<Cart>(context);
 
-        //public IGenericRepository<Customer> CustomerRepository => _customerRepository ?? new GenericRepository<Customer>(context);
+        public IGenericRepository<CartItem> CartItemRepository => _cartItemRepository ?? new GenericRepository<CartItem>(context);
 
-        //public IGenericRepository<RoomInformation> RoomInformationRepository => _roomInformationRepository ?? new GenericRepository<RoomInformation>(context);
+        public IGenericRepository<Category> CategoryRepository => _categoryRepository ?? new GenericRepository<Category>(context);
 
-        //public IGenericRepository<RoomType> RoomTypeRepository => _roomTypeRepository ?? new GenericRepository<RoomType>(context);
+        public IGenericRepository<Customer> CustomerRepository => _customerRepository ?? new GenericRepository<Customer>(context);
 
-        //public void Dispose()
-        //{
-        //    Dispose(true);
-        //    GC.SuppressFinalize(this);
-        //}
+        public IGenericRepository<Order> OrderRepository => _orderRepository ?? new GenericRepository<Order>(context);
 
-        //protected virtual void Dispose(bool disposing)
-        //{
-        //    if (!disposed)
-        //    {
-        //        if (disposing)
-        //        {
-        //            context.Dispose();
-        //        }
-        //    }
-        //    disposed = true;
-        //}
+        public IGenericRepository<OrderDetail> OrderDetailRepository => _orderDetailRepository ?? new GenericRepository<OrderDetail>(context);
 
-        //public void Save()
-        //{
-        //    context.SaveChanges();
-        //}
+        public IGenericRepository<Product> ProductRepository => _productRepository ?? new GenericRepository<Product>(context);
+
+        public IGenericRepository<ProductImage> ProductImageRepository => _productImageRepository ?? new GenericRepository<ProductImage>(context);
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
+            {
+                if (disposing)
+                {
+                    context.Dispose();
+                }
+            }
+            disposed = true;
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        public async Task SaveAsync()
+        {
+            await context.SaveChangesAsync();
+        }
     }
 }

@@ -7,10 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="ModelView\" />
-    <Folder Include="Mapper\" />
-    <Folder Include="Service\Implement\" />
-    <Folder Include="Service\Interface\" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
   </ItemGroup>
 
   <ItemGroup>
