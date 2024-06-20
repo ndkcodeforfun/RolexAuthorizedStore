@@ -42,5 +42,23 @@ namespace RolexApplication_BAL.Service.Implement
                 throw new Exception(ex.Message);
             }
         }
+
+        public async Task<CategoryView> GetCategoryById(int id)
+        {
+            try
+            {
+                var category = await _unitOfWork.CategoryRepository.GetByIDAsync(id);
+                if (category == null)
+                {
+                    return null;
+                }
+                var categoryView = _mapper.Map<CategoryView>(category);
+                return categoryView;
+            } catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            
+        }
     }
 }

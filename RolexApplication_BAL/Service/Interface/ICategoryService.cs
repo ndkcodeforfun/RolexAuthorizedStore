@@ -10,5 +10,6 @@ namespace RolexApplication_BAL.Service.Interface
     public interface ICategoryService
     {
         Task<List<CategoryView>> GetAllCategories();
+        Task<CategoryView> GetCategoryById(int id);
     }
 }
