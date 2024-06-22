@@ -12,10 +12,9 @@ namespace RolexApplication_DAL.UnitOfWork.Interface
     public interface IUnitOfWork
     {
 
-        IGenericRepository<Cart> CartRepository { get; }
         IGenericRepository<CartItem> CartItemRepository { get; }
         IGenericRepository<Category> CategoryRepository { get; }
-
+        IGenericRepository<ChatRequest> ChatRequestRepository { get; }
         IGenericRepository<Customer> CustomerRepository { get; }
         IGenericRepository<Order> OrderRepository { get; }
         IGenericRepository<OrderDetail> OrderDetailRepository { get; }

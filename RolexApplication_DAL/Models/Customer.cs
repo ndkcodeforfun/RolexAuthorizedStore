@@ -7,7 +7,7 @@ namespace RolexApplication_DAL.Models
     {
         public Customer()
         {
-            Carts = new HashSet<Cart>();
+            CartItems = new HashSet<CartItem>();
             Orders = new HashSet<Order>();
         }
 
@@ -21,7 +21,7 @@ namespace RolexApplication_DAL.Models
         public DateTime? DoB { get; set; }
         public string? Avatar { get; set; }
 
-        public virtual ICollection<Cart> Carts { get; set; }
+        public virtual ICollection<CartItem> CartItems { get; set; }
         public virtual ICollection<Order> Orders { get; set; }
     }
 }

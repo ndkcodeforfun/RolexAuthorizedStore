@@ -15,8 +15,8 @@ namespace DAL.UnitOfWork.Implement
     {
         private RolexAuthorizedStoreDbContext context = new RolexAuthorizedStoreDbContext();
         private GenericRepository<Customer> _customerRepository;
-        private GenericRepository<Cart> _cartRepository;
         private GenericRepository<CartItem> _cartItemRepository;
+        private GenericRepository<ChatRequest> _chatRequestRepository;
         private GenericRepository<Category> _categoryRepository;
         private GenericRepository<Order> _orderRepository;
         private GenericRepository<OrderDetail> _orderDetailRepository;
@@ -29,7 +29,6 @@ namespace DAL.UnitOfWork.Implement
             this.context = context;
         }
         private bool disposed = false;
-        public IGenericRepository<Cart> CartRepository => _cartRepository ?? new GenericRepository<Cart>(context);
 
         public IGenericRepository<CartItem> CartItemRepository => _cartItemRepository ?? new GenericRepository<CartItem>(context);
 
@@ -44,6 +43,8 @@ namespace DAL.UnitOfWork.Implement
         public IGenericRepository<Product> ProductRepository => _productRepository ?? new GenericRepository<Product>(context);
 
         public IGenericRepository<ProductImage> ProductImageRepository => _productImageRepository ?? new GenericRepository<ProductImage>(context);
+
+        public IGenericRepository<ChatRequest> ChatRequestRepository => _chatRequestRepository ?? new GenericRepository<ChatRequest>(context);
 
         protected virtual void Dispose(bool disposing)
         {

@@ -40,18 +40,12 @@ create table ProductImages (
 	CONSTRAINT FK_ProductId_ProductImages FOREIGN KEY (ProductId) REFERENCES Products(ProductId)
 )
 
-create table Carts (
-	CartId INT IDENTITY(1,1) PRIMARY KEY,
-	CustomerId INT NOT NULL,
-	CONSTRAINT FK_CustomerId_Carts FOREIGN KEY (CustomerId) REFERENCES Customers(CustomerId),
-)
-
 create table CartItems (
 	ItemId INT IDENTITY(1,1) PRIMARY KEY,
-	CartId INT NOT NULL,
+	CustomerId INT NOT NULL,
 	ProductId INT NOT NULL,
 	Quantity INT NOT NULL,
-	CONSTRAINT FK_CartId FOREIGN KEY (CartId) REFERENCES Carts(CartId),
+	CONSTRAINT FK_CustomerId_CartItems FOREIGN KEY (CustomerId) REFERENCES Customers(CustomerId),
 	CONSTRAINT FK_ProductId_CartItems FOREIGN KEY (ProductId) REFERENCES Products(ProductId),
 )
 
@@ -71,4 +65,12 @@ create table OrderDetails (
 	Quantity INT NOT NULL,
 	CONSTRAINT FK_ProductId_OrderDetails FOREIGN KEY (ProductId) REFERENCES Products(ProductId),
 	CONSTRAINT FK_OrderId_OrderDetails FOREIGN KEY (OrderId) REFERENCES Orders(OrderId)
+)
+
+create table ChatRequest (
+	MessageId INT IDENTITY(1,1) PRIMARY KEY,
+	CustomerId INT NOT NULL,
+	Content NVARCHAR(MAX),
+	SendTime DATETIME,
+	Status INT NOT NULL
 )

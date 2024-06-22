@@ -18,6 +18,7 @@ namespace RolexApplication_BAL.Mapper
             CreateMap<Category, CategoryDtoRequest>().ReverseMap();
             CreateMap<Customer, CustomerDtoResponse>().ReverseMap();
             CreateMap<Customer, CustomerDtoRequest>().ReverseMap();
+            CreateMap<CartItem, CartItemDtoRequest>().ReverseMap();
         }
     }
 }

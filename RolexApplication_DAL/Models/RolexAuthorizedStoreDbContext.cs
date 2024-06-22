@@ -16,9 +16,9 @@ namespace RolexApplication_DAL.Models
         {
         }
 
-        public virtual DbSet<Cart> Carts { get; set; } = null!;
         public virtual DbSet<CartItem> CartItems { get; set; } = null!;
         public virtual DbSet<Category> Categories { get; set; } = null!;
+        public virtual DbSet<ChatRequest> ChatRequests { get; set; } = null!;
         public virtual DbSet<Customer> Customers { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderDetail> OrderDetails { get; set; } = null!;
@@ -36,25 +36,16 @@ namespace RolexApplication_DAL.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Cart>(entity =>
-            {
-                entity.HasOne(d => d.Customer)
-                    .WithMany(p => p.Carts)
-                    .HasForeignKey(d => d.CustomerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_CustomerId_Carts");
-            });
-
             modelBuilder.Entity<CartItem>(entity =>
             {
                 entity.HasKey(e => e.ItemId)
-                    .HasName("PK__CartItem__727E838BF68E1CC0");
+                    .HasName("PK__CartItem__727E838B93F3A0E7");
 
-                entity.HasOne(d => d.Cart)
+                entity.HasOne(d => d.Customer)
                     .WithMany(p => p.CartItems)
-                    .HasForeignKey(d => d.CartId)
+                    .HasForeignKey(d => d.CustomerId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_CartId");
+                    .HasConstraintName("FK_CustomerId_CartItems");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.CartItems)
@@ -66,6 +57,16 @@ namespace RolexApplication_DAL.Models
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.Property(e => e.Name).HasMaxLength(255);
+            });
+
+            modelBuilder.Entity<ChatRequest>(entity =>
+            {
+                entity.HasKey(e => e.MessageId)
+                    .HasName("PK__ChatRequ__C87C0C9C804BC91B");
+
+                entity.ToTable("ChatRequest");
+
+                entity.Property(e => e.SendTime).HasColumnType("datetime");
             });
 
             modelBuilder.Entity<Customer>(entity =>
@@ -127,7 +128,7 @@ namespace RolexApplication_DAL.Models
             modelBuilder.Entity<ProductImage>(entity =>
             {
                 entity.HasKey(e => e.ImageId)
-                    .HasName("PK__ProductI__7516F70C0A710276");
+                    .HasName("PK__ProductI__7516F70CCC3484C8");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.ProductImages)
