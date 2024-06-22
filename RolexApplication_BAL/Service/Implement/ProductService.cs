@@ -47,12 +47,19 @@ namespace RolexApplication_BAL.Service.Implement
             }
         }
 
-        public async Task<IEnumerable<ProductVIew>> GetAllProducts()
+        public async Task<List<ProductVIew>> GetAllProducts(int CategoryId)
         {
             try
             {
-                var products = await _unitOfWork.ProductRepository.FindAsync(p => p.Status == 1);
-                if (products != null)
+                var products = new List<Product>();
+                if(CategoryId == 0)
+                {
+                    products = (await _unitOfWork.ProductRepository.GetAsync(p => p.Status == 1)).ToList();
+                } else
+                {
+                    products = (await _unitOfWork.ProductRepository.GetAsync(p => p.Status == 1 && p.CategoryId == CategoryId)).ToList();
+                }
+                if (products.Any())
                 {
                     List<ProductVIew> list = new List<ProductVIew>();
                     foreach (var product in products)
@@ -74,14 +81,14 @@ namespace RolexApplication_BAL.Service.Implement
 
         }
 
-        public async Task<ProductVIew> GetProductByID(int id)
+        public async Task<ProductDtoRequest> GetProductByID(int id)
         {
             try
             {
-                var product = await _unitOfWork.ProductRepository.GetByIDAsync(id);
+                var product = (await _unitOfWork.ProductRepository.GetAsync(filter: p => p.ProductId == id, includeProperties: "Category")).FirstOrDefault();
                 if (product != null)
                 {
-                    var productView = _mapper.Map<ProductVIew>(product);
+                    var productView = _mapper.Map<ProductDtoRequest>(product);
                     return productView;
                 }
                 else

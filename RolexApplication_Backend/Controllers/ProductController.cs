@@ -49,9 +49,9 @@ namespace RolexApplication_Backend.Controllers
             }
         }
         [HttpGet("/api/v1/Products")]
-        public async Task<IActionResult> GetAllProduct()
+        public async Task<IActionResult> GetAllProduct([FromQuery] int CategoryId)
         {
-            var products = await _productService.GetAllProducts();
+            var products = await _productService.GetAllProducts(CategoryId);
             if(products != null)
             {
                 return Ok(products);

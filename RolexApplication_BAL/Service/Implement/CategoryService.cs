@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using RolexApplication_DAL.UnitOfWork.Interface;
+using RolexApplication_DAL.Models;
+using Azure.Core;
 
 namespace RolexApplication_BAL.Service.Implement
 {
@@ -20,6 +22,42 @@ namespace RolexApplication_BAL.Service.Implement
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
+
+        public async Task CreateCategory(CategoryDtoRequest request)
+        {
+            try
+            {
+                var category = _mapper.Map<Category>(request);
+                category.Status = 1;
+                await _unitOfWork.CategoryRepository.InsertAsync(category);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task DeleteCategory(int CategoryId)
+        {
+            try
+            {
+                var category = (await _unitOfWork.CategoryRepository.FindAsync(c => c.CategoryId == CategoryId)).FirstOrDefault();
+                if (category == null)
+                {
+                    throw new Exception("No category match this id");
+                }
+                else
+                {
+                    await _unitOfWork.CategoryRepository.DeleteAsync(category);
+                    await _unitOfWork.SaveAsync();
+                }
+            }
+            catch (Exception ex) { 
+                throw new Exception(ex.Message);
+            }
+        }
+
         public async Task<List<CategoryView>> GetAllCategories()
         {
             try
@@ -58,7 +96,27 @@ namespace RolexApplication_BAL.Service.Implement
             {
                 throw new Exception(ex.Message);
             }
-            
+        }
+
+        public async Task UpdateCategory(int CategoryId, CategoryDtoRequest request)
+        {
+            try
+            {
+                var category = (await _unitOfWork.CategoryRepository.FindAsync(c => c.CategoryId == CategoryId)).FirstOrDefault();
+                if (category == null) {
+                    throw new Exception("No category match this id");
+                } else
+                {
+                    category.Name = request.Name;
+                    category.Description = request.Description;
+                    await _unitOfWork.CategoryRepository.UpdateAsync(category);
+                    await _unitOfWork.SaveAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
         }
     }
 }

@@ -11,9 +11,9 @@ namespace RolexApplication_BAL.Service.Interface
     {
         Task<bool> AddNewProduct(ProductVIew productVIew);
 
-        Task<IEnumerable<ProductVIew>> GetAllProducts();
+        Task<List<ProductVIew>> GetAllProducts(int CategoryId);
 
-        Task<ProductVIew> GetProductByID(int id);
+        Task<ProductDtoRequest> GetProductByID(int id);
 
         Task<bool> UpdateProduct(ProductVIew productVIew);
 
