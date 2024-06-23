@@ -17,7 +17,7 @@ namespace RolexApplication_Backend.Controllers
             _categoryService = categoryService;
         }
         [HttpPost("/api/v1/Products/CreateProduct")]
-        public async Task<IActionResult> CreateProduct(ProductVIew product)
+        public async Task<IActionResult> CreateProduct(ProductDtoRequest product)
         {
             if (product.CategoryId == null)
             {
@@ -38,6 +38,10 @@ namespace RolexApplication_Backend.Controllers
             if (product.Price == null)
             {
                 return BadRequest("Price is required");
+            }
+            if (product.Quantity == null)
+            {
+                return BadRequest("Quantity is required");
             }
             var checkSuccess = await _productService.AddNewProduct(product);
             if(checkSuccess)
@@ -76,8 +80,8 @@ namespace RolexApplication_Backend.Controllers
             }
         }
 
-        [HttpPut("/api/v1/product")]
-        public async Task<IActionResult> UpdateProduct(ProductVIew product)
+        [HttpPut("/api/v1/product/{id}")]
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductDtoRequest product, int id)
         {
             if (product.CategoryId == null)
             {
@@ -99,7 +103,11 @@ namespace RolexApplication_Backend.Controllers
             {
                 return BadRequest("Price is required");
             }
-            var checkSuccess = await _productService.UpdateProduct(product);
+            if (product.Quantity == null)
+            {
+                return BadRequest("Quantity is required");
+            }
+            var checkSuccess = await _productService.UpdateProduct(product, id);
             if (checkSuccess)
             {
                 return Ok("Update successful");
@@ -114,9 +122,13 @@ namespace RolexApplication_Backend.Controllers
         public async Task<IActionResult> UpdateStatusProduct(int id)
         {
             var check = await _productService.StatusProduct(id);
-            if(check)
+            if (check == 1)
             {
                 return Ok("Update successful");
+            }
+            
+            else if (check == 2) {
+                return BadRequest("This product is currently out of stock, please update quantity first");
             }
             else
             {

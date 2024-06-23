@@ -9,14 +9,14 @@ namespace RolexApplication_BAL.Service.Interface
 {
     public interface IProductService
     {
-        Task<bool> AddNewProduct(ProductVIew productVIew);
+        Task<bool> AddNewProduct(ProductDtoRequest productVIew);
 
         Task<List<ProductVIew>> GetAllProducts(int CategoryId);
 
-        Task<ProductDtoRequest> GetProductByID(int id);
+        Task<ProductVIew> GetProductByID(int id);
 
-        Task<bool> UpdateProduct(ProductVIew productVIew);
+        Task<bool> UpdateProduct(ProductDtoRequest request, int id);
 
-        Task<bool> StatusProduct(int id);
+        Task<int> StatusProduct(int id);
     }
 }

@@ -15,6 +15,7 @@ create table Customers (
 	DoB Datetime,
 	Avatar NVARCHAR(MAX)
 )
+GO
 
 create table Categories (
 	CategoryId INT IDENTITY(1,1) PRIMARY KEY,
@@ -29,9 +30,23 @@ create table Products (
 	Name NVARCHAR(255) NOT NULL,
 	Description NVARCHAR(MAX),
 	Price decimal(13, 2) NOT NULL,
+	Quantity INT NOT NULL CHECK (Quantity >= 0),
 	Status INT NOT NULL,
 	CONSTRAINT FK_CategoryId FOREIGN KEY (CategoryId) REFERENCES Categories(CategoryId)
 )
+GO
+
+-- Create trigger to update status based on quantity
+CREATE TRIGGER trg_UpdateProductStatus
+ON Products
+AFTER UPDATE
+AS
+BEGIN
+    UPDATE Products
+    SET Status = 0
+    WHERE Quantity = 0 AND ProductId IN (SELECT ProductId FROM inserted);
+END;
+GO
 
 create table ProductImages (
 	ImageId INT IDENTITY(1,1) PRIMARY KEY,
@@ -39,6 +54,7 @@ create table ProductImages (
 	ImagePath NVARCHAR(MAX),
 	CONSTRAINT FK_ProductId_ProductImages FOREIGN KEY (ProductId) REFERENCES Products(ProductId)
 )
+GO
 
 create table CartItems (
 	ItemId INT IDENTITY(1,1) PRIMARY KEY,
@@ -48,6 +64,7 @@ create table CartItems (
 	CONSTRAINT FK_CustomerId_CartItems FOREIGN KEY (CustomerId) REFERENCES Customers(CustomerId),
 	CONSTRAINT FK_ProductId_CartItems FOREIGN KEY (ProductId) REFERENCES Products(ProductId),
 )
+GO
 
 create table Orders (
 	OrderId INT IDENTITY(1,1) PRIMARY KEY,
@@ -56,6 +73,7 @@ create table Orders (
 	Status INT NOT NULL,
 	CONSTRAINT FK_CustomerId_Orders FOREIGN KEY (CustomerId) REFERENCES Customers(CustomerId),
 )
+GO
 
 create table OrderDetails (
 	OrderDetailId INT IDENTITY(1,1) PRIMARY KEY,
@@ -66,6 +84,7 @@ create table OrderDetails (
 	CONSTRAINT FK_ProductId_OrderDetails FOREIGN KEY (ProductId) REFERENCES Products(ProductId),
 	CONSTRAINT FK_OrderId_OrderDetails FOREIGN KEY (OrderId) REFERENCES Orders(OrderId)
 )
+GO
 
 create table ChatRequest (
 	MessageId INT IDENTITY(1,1) PRIMARY KEY,
@@ -74,3 +93,4 @@ create table ChatRequest (
 	SendTime DATETIME,
 	Status INT NOT NULL
 )
+GO

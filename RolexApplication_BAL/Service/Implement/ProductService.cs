@@ -21,7 +21,7 @@ namespace RolexApplication_BAL.Service.Implement
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<bool> AddNewProduct(ProductVIew productVIew)
+        public async Task<bool> AddNewProduct(ProductDtoRequest productVIew)
         {
             try
             {
@@ -29,8 +29,8 @@ namespace RolexApplication_BAL.Service.Implement
                 var checkCategory = _unitOfWork.CategoryRepository.GetByIDAsync(productVIew.CategoryId);
                 if (checkCategory != null)
                 {
-                    productVIew.Status = 1;
                     var product = _mapper.Map<Product>(productVIew);
+                    product.Status = 1;
                     await _unitOfWork.ProductRepository.InsertAsync(product);
                     await _unitOfWork.SaveAsync();
                     status = true;
@@ -81,14 +81,14 @@ namespace RolexApplication_BAL.Service.Implement
 
         }
 
-        public async Task<ProductDtoRequest> GetProductByID(int id)
+        public async Task<ProductVIew> GetProductByID(int id)
         {
             try
             {
                 var product = (await _unitOfWork.ProductRepository.GetAsync(filter: p => p.ProductId == id, includeProperties: "Category")).FirstOrDefault();
                 if (product != null)
                 {
-                    var productView = _mapper.Map<ProductDtoRequest>(product);
+                    var productView = _mapper.Map<ProductVIew>(product);
                     return productView;
                 }
                 else
@@ -102,7 +102,7 @@ namespace RolexApplication_BAL.Service.Implement
             
         }
 
-        public async Task<bool> StatusProduct(int id)
+        public async Task<int> StatusProduct(int id)
         {
             try
             {
@@ -112,23 +112,30 @@ namespace RolexApplication_BAL.Service.Implement
                 {
                     if(checkProduct.Status == 1)
                     {
-                        checkProduct.Status = 2;
+                        checkProduct.Status = 0;
                         await _unitOfWork.ProductRepository.UpdateAsync(checkProduct);
                         await _unitOfWork.SaveAsync();
-                        return true;
+                        return 1;
                     }
-                    else 
+                    else if (checkProduct.Status == 0)
                     {
+                        if (checkProduct.Quantity == 0)
+                        {
+                            return 2;
+                        }
                         checkProduct.Status = 1;
                         await _unitOfWork.ProductRepository.UpdateAsync(checkProduct);
                         await _unitOfWork.SaveAsync();
-                        return true;
-                    }    
+                        return 1;
+                    } else
+                    {
+                        return 0;
+                    }
                     
                 }
                 else
                 {
-                    return false;
+                    return 0;
                 }
             }
             catch (Exception ex)
@@ -138,19 +145,18 @@ namespace RolexApplication_BAL.Service.Implement
             
         }
 
-        public async Task<bool> UpdateProduct(ProductVIew productVIew)
+        public async Task<bool> UpdateProduct(ProductDtoRequest request, int id)
         {
             try
             {
                 bool status = false;
-                var checkCategory = _unitOfWork.CategoryRepository.GetByIDAsync(productVIew.CategoryId);
+                var checkCategory = _unitOfWork.CategoryRepository.GetByIDAsync(request.CategoryId);
                 if (checkCategory != null)
                 {
-                    var checkProduct = await _unitOfWork.ProductRepository.GetByIDAsync(productVIew.ProductId);
+                    var checkProduct = await _unitOfWork.ProductRepository.GetByIDAsync(id);
                     if (checkProduct != null)
                     {
-                        _mapper.Map(productVIew, checkProduct);
-                        checkProduct.Status = 1;
+                        _mapper.Map(request, checkProduct);
                         await _unitOfWork.ProductRepository.UpdateAsync(checkProduct);
                         await _unitOfWork.SaveAsync();
                         status = true;

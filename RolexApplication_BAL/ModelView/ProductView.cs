@@ -14,5 +14,7 @@ namespace RolexApplication_BAL.ModelView
         public string? Description { get; set; }
         public decimal Price { get; set; }
         public int Status { get; set; }
+        public int Quantity { get; set; }
+        public CategoryDtoRequest? category { get; set; }
     }
 }
