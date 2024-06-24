@@ -22,13 +22,31 @@ namespace RolexApplication_BAL.Service.Implement
             _mapper = mapper;
         }
 
-        public async Task AddToCart(CartItemDtoRequest request)
+        public async Task<bool> AddToCart(CartItemDtoRequest request)
         {
             try
             {
-                var cartItem = _mapper.Map<CartItem>(request);
-                await _unitOfWork.CartItemRepository.InsertAsync(cartItem);
-                await _unitOfWork.SaveAsync();
+                var existedItemInCart = (await _unitOfWork.CartItemRepository.GetAsync(filter: c => c.ProductId == request.ProductId && c.CustomerId == request.CustomerId, includeProperties: "Product")).FirstOrDefault();
+                if (existedItemInCart == null)
+                {
+                    var cartItem = _mapper.Map<CartItem>(request);
+                    await _unitOfWork.CartItemRepository.InsertAsync(cartItem);
+                    await _unitOfWork.SaveAsync();
+                    return true;
+                }
+                else {
+                    var totalItem = existedItemInCart.Quantity + request.Quantity;
+                    if (existedItemInCart.Product.Quantity > totalItem)
+                    {
+                        existedItemInCart.Quantity = totalItem;
+                        await _unitOfWork.CartItemRepository.UpdateAsync(existedItemInCart);
+                        await _unitOfWork.SaveAsync();
+                        return true;
+                    } else
+                    {
+                        return false;
+                    }
+                }
             }
             catch (Exception ex)
             {

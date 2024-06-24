@@ -9,7 +9,7 @@ namespace RolexApplication_BAL.Service.Interface
 {
     public interface ICartItemService
     {
-        Task AddToCart(CartItemDtoRequest request);
+        Task<bool> AddToCart(CartItemDtoRequest request);
 
         Task<List<CartItemDtoResponse>> GetCartItemsByCustomerId(int CustomerId);
 

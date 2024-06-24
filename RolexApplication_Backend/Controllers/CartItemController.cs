@@ -26,8 +26,15 @@ namespace RolexApplication_Backend.Controllers
                 if (request == null) {
                     return BadRequest("Cannot add empty object to cart");
                 }
-                await _cartItemService.AddToCart(request);
-                return Ok();
+                var status = await _cartItemService.AddToCart(request);
+                if (status)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Cannot add this project to cart because of larger quantity than in stock");
+                }
             }
             catch (Exception ex)
             {

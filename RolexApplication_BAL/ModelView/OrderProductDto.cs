@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace RolexApplication_BAL.ModelView
 {
-    public class CartItemDtoResponse
+    public class OrderProductDto
     {
         public int ItemId { get; set; }
         public int CustomerId { get; set; }
         public int ProductId { get; set; }
         public int Quantity { get; set; }
-
-        public ProductDtoResponse ProductVIew { get; set; } = new ProductDtoResponse();
     }
 }

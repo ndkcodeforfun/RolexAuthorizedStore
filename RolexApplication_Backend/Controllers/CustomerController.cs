@@ -62,9 +62,9 @@ namespace RolexApplication_Backend.Controllers
                 {
                     return BadRequest("Customer information cannot empty");
                 }
-                if (request.Email.IsNullOrEmpty() || request.Password.IsNullOrEmpty() || request.DoB == null || request.Address.IsNullOrEmpty() || request.Name.IsNullOrEmpty() || request.Phone.IsNullOrEmpty())
+                if (request.Email.IsNullOrEmpty() || request.Password.IsNullOrEmpty())
                 {
-                    return BadRequest("Please fill all fields");
+                    return BadRequest("Please fill at least email and password fields");
                 }
                 if (await _customerService.IsDublicatedEmail(request.Email))
                 {
