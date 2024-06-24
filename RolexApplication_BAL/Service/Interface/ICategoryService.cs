@@ -9,8 +9,8 @@ namespace RolexApplication_BAL.Service.Interface
 {
     public interface ICategoryService
     {
-        Task<List<CategoryView>> GetAllCategories();
-        Task<CategoryView> GetCategoryById(int id);
+        Task<List<CategoryDtoResponse>> GetAllCategories();
+        Task<CategoryDtoResponse> GetCategoryById(int id);
         Task CreateCategory(CategoryDtoRequest request);
         Task UpdateCategory(int CategoryId, CategoryDtoRequest request);
         Task DeleteCategory(int CategoryId);

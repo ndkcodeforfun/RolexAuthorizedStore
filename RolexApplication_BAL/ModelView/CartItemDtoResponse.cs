@@ -12,6 +12,6 @@ namespace RolexApplication_BAL.ModelView
         public int ProductId { get; set; }
         public int Quantity { get; set; }
 
-        public ProductVIew ProductVIew { get; set; } = new ProductVIew();
+        public ProductDtoResponse ProductVIew { get; set; } = new ProductDtoResponse();
     }
 }

@@ -58,7 +58,7 @@ namespace RolexApplication_BAL.Service.Implement
             }
         }
 
-        public async Task<List<CategoryView>> GetAllCategories()
+        public async Task<List<CategoryDtoResponse>> GetAllCategories()
         {
             try
             {
@@ -67,10 +67,10 @@ namespace RolexApplication_BAL.Service.Implement
                 {
                     return null;
                 }
-                List<CategoryView> categoryViews = new List<CategoryView>();
+                List<CategoryDtoResponse> categoryViews = new List<CategoryDtoResponse>();
                 foreach (var Type in categoryes)
                 {
-                    var categoryView = _mapper.Map<CategoryView>(Type);
+                    var categoryView = _mapper.Map<CategoryDtoResponse>(Type);
                     categoryViews.Add(categoryView);
                 }
                 return categoryViews;
@@ -81,7 +81,7 @@ namespace RolexApplication_BAL.Service.Implement
             }
         }
 
-        public async Task<CategoryView> GetCategoryById(int id)
+        public async Task<CategoryDtoResponse> GetCategoryById(int id)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace RolexApplication_BAL.Service.Implement
                 {
                     return null;
                 }
-                var categoryView = _mapper.Map<CategoryView>(category);
+                var categoryView = _mapper.Map<CategoryDtoResponse>(category);
                 return categoryView;
             } catch (Exception ex)
             {

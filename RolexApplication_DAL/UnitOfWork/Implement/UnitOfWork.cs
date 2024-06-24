@@ -1,4 +1,6 @@
 ﻿
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
 using RolexApplication_DAL.Models;
 using RolexApplication_DAL.Repository.Implement;
 using RolexApplication_DAL.Repository.Implement.Interface;
@@ -66,6 +68,11 @@ namespace DAL.UnitOfWork.Implement
         public async Task SaveAsync()
         {
             await context.SaveChangesAsync();
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await context.Database.BeginTransactionAsync();
         }
     }
 }

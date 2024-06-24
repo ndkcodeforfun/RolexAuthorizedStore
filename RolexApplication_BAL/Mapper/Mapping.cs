@@ -12,9 +12,9 @@ namespace RolexApplication_BAL.Mapper
     public class Mapping : Profile
     {
         public Mapping() {
-            CreateMap<Product, ProductVIew>().ReverseMap();
+            CreateMap<Product, ProductDtoResponse>().ReverseMap();
             CreateMap<Product, ProductDtoRequest>().ReverseMap();
-            CreateMap<Category, CategoryView>().ReverseMap();
+            CreateMap<Category, CategoryDtoResponse>().ReverseMap();
             CreateMap<Category, CategoryDtoRequest>().ReverseMap();
             CreateMap<Customer, CustomerDtoResponse>().ReverseMap();
             CreateMap<Customer, CustomerDtoRequest>().ReverseMap();

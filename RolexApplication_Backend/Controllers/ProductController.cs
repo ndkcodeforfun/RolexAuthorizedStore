@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RolexApplication_BAL.ModelView;
 using RolexApplication_BAL.Service.Interface;
+using RolexApplication_DAL.Models;
 
 namespace RolexApplication_Backend.Controllers
 {
@@ -11,53 +13,86 @@ namespace RolexApplication_Backend.Controllers
     {
         private readonly IProductService _productService;
         private readonly ICategoryService _categoryService;
-        public ProductController(IProductService productService, ICategoryService categoryService)
+        private readonly string _imagesDirectory;
+        private readonly IMapper _mapper;
+
+        public ProductController(IProductService productService, ICategoryService categoryService, IWebHostEnvironment env, IMapper mapper)
         {
             _productService = productService;
             _categoryService = categoryService;
+            _imagesDirectory = Path.Combine(env.ContentRootPath, "img", "product");
+            _mapper = mapper;
         }
+
         [HttpPost("/api/v1/Products/CreateProduct")]
-        public async Task<IActionResult> CreateProduct(ProductDtoRequest product)
+        public async Task<IActionResult> CreateProduct([FromBody] ProductDtoRequest productView)
         {
-            if (product.CategoryId == null)
+            try
             {
-                return BadRequest("CategoryId is required");
+                if (await _categoryService.GetCategoryById(productView.CategoryId) == null)
+                {
+                    return BadRequest("Category not found");
+                }
+                if (productView.Name == null)
+                {
+                    return BadRequest("Name is required");
+                }
+                if (productView.Description == null)
+                {
+                    return BadRequest("Description is required");
+                }
+                var imagePaths = new List<string>();
+                if (productView.Images.Any())
+                {
+                    foreach (var image in productView.Images)
+                    {
+                        if (!String.IsNullOrEmpty(image.Base64StringImage))
+                        {
+                            byte[] imageBytes = Convert.FromBase64String(image.Base64StringImage);
+                            string filename = $"ProductImage_{Guid.NewGuid()}.png";
+                            string imagePath = Path.Combine(_imagesDirectory, filename);
+                            System.IO.File.WriteAllBytes(imagePath, imageBytes);
+                            imagePaths.Add(filename);
+                        }
+                    }
+                }
+                var product = _mapper.Map<Product>(productView);
+                var checkSuccess = await _productService.AddNewProduct(product, imagePaths);
+                if (checkSuccess)
+                {
+                    return Ok("Create successful");
+                }
+                else
+                {
+                    return BadRequest("Create fail");
+                }
             }
-            if (await _categoryService.GetCategoryById(product.CategoryId) == null)
+            catch (Exception ex)
             {
-                return BadRequest("Category not found");
-            } 
-            if(product.Name == null)
-            {
-                return BadRequest("Name is required");
-            }
-            if (product.Description == null)
-            {
-                return BadRequest("Description is required");
-            }
-            if (product.Price == null)
-            {
-                return BadRequest("Price is required");
-            }
-            if (product.Quantity == null)
-            {
-                return BadRequest("Quantity is required");
-            }
-            var checkSuccess = await _productService.AddNewProduct(product);
-            if(checkSuccess)
-            {
-                return Ok("Create successful");
-            } else
-            {
-                return BadRequest("Create fail");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
+
         [HttpGet("/api/v1/Products")]
         public async Task<IActionResult> GetAllProduct([FromQuery] int CategoryId)
         {
             var products = await _productService.GetAllProducts(CategoryId);
             if(products != null)
             {
+                foreach (var product in products) {
+                    if (product.Images.Any())
+                    {
+                        foreach (var image in product.Images)
+                        {
+                            var imagePath = Path.Combine(_imagesDirectory, image.Base64StringImage);
+                            if (System.IO.File.Exists(imagePath))
+                            {
+                                byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+                                image.Base64StringImage = Convert.ToBase64String(imageBytes);
+                            }
+                        }
+                    }
+                }
                 return Ok(products);
             }
             else
@@ -72,6 +107,17 @@ namespace RolexApplication_Backend.Controllers
             var product = await _productService.GetProductByID(id);
             if(product != null)
             {
+                if (product.Images.Any())
+                {
+                    foreach (var image in product.Images) {
+                        var imagePath = Path.Combine(_imagesDirectory, image.Base64StringImage);
+                        if (System.IO.File.Exists(imagePath))
+                        {
+                            byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+                            image.Base64StringImage = Convert.ToBase64String(imageBytes);
+                        }
+                    }
+                }
                 return Ok(product);
             }
             else
@@ -81,34 +127,50 @@ namespace RolexApplication_Backend.Controllers
         }
 
         [HttpPut("/api/v1/product/{id}")]
-        public async Task<IActionResult> UpdateProduct([FromBody] ProductDtoRequest product, int id)
+        public async Task<IActionResult> UpdateProduct([FromBody] ProductDtoRequest productView, int id)
         {
-            if (product.CategoryId == null)
-            {
-                return BadRequest("CategoryId is required");
-            }
-            if (await _categoryService.GetCategoryById(product.CategoryId) == null)
+            if (await _categoryService.GetCategoryById(productView.CategoryId) == null)
             {
                 return BadRequest("Category not found");
             }
-            if (product.Name == null)
+            if (productView.Name == null)
             {
                 return BadRequest("Name is required");
             }
-            if (product.Description == null)
+            if (productView.Description == null)
             {
                 return BadRequest("Description is required");
             }
-            if (product.Price == null)
+            var imagePaths = new List<string>();
+            if (productView.Images.Any())
             {
-                return BadRequest("Price is required");
+                foreach (var image in productView.Images)
+                {
+                    if (!String.IsNullOrEmpty(image.Base64StringImage))
+                    {
+                        byte[] imageBytes = Convert.FromBase64String(image.Base64StringImage);
+                        string filename = $"ProductImage_{Guid.NewGuid()}.png";
+                        string imagePath = Path.Combine(_imagesDirectory, filename);
+                        System.IO.File.WriteAllBytes(imagePath, imageBytes);
+                        imagePaths.Add(filename);
+                    }
+                }
             }
-            if (product.Quantity == null)
-            {
-                return BadRequest("Quantity is required");
+            var checkSuccess = await _productService.UpdateProduct(productView, imagePaths, id);
+            if (checkSuccess.check && checkSuccess.oldImagePaths != null) {
+                if (checkSuccess.oldImagePaths.Any())
+                {
+                    foreach (var oldImagePath in checkSuccess.oldImagePaths)
+                    {
+                        var fullImagePath = Path.Combine(_imagesDirectory, oldImagePath);
+                        if (System.IO.File.Exists(fullImagePath))
+                        {
+                            System.IO.File.Delete(fullImagePath);
+                        }
+                    }
+                }
             }
-            var checkSuccess = await _productService.UpdateProduct(product, id);
-            if (checkSuccess)
+            if (checkSuccess.check)
             {
                 return Ok("Update successful");
             }

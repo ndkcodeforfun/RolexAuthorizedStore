@@ -65,7 +65,7 @@ namespace RolexApplication_BAL.Service.Implement
                 foreach (var item in cartItems)
                 {
                     var itemView = _mapper.Map<CartItemDtoResponse>(item);
-                    itemView.ProductVIew = _mapper.Map<ProductVIew>(item.Product);
+                    itemView.ProductVIew = _mapper.Map<ProductDtoResponse>(item.Product);
                     response.Add(itemView);
                 }
                 return response;

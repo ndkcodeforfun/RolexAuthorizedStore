@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.EntityFrameworkCore.Storage;
 using RolexApplication_DAL.Models;
 using RolexApplication_DAL.Repository.Implement.Interface;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RolexApplication_DAL.UnitOfWork.Interface
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
 
         IGenericRepository<CartItem> CartItemRepository { get; }
@@ -22,7 +23,7 @@ namespace RolexApplication_DAL.UnitOfWork.Interface
         IGenericRepository<Product> ProductRepository { get; }
         IGenericRepository<ProductImage> ProductImageRepository { get; }
 
-
+        Task<IDbContextTransaction> BeginTransactionAsync();
         Task SaveAsync();
     }
 }

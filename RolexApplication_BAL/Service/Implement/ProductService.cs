@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RolexApplication_BAL.Service.Implement
 {
@@ -21,33 +22,56 @@ namespace RolexApplication_BAL.Service.Implement
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<bool> AddNewProduct(ProductDtoRequest productVIew)
+
+        public async Task<bool> AddNewProduct(Product product, List<string> imagePaths)
         {
-            try
-            {
-                bool status = false;
-                var checkCategory = _unitOfWork.CategoryRepository.GetByIDAsync(productVIew.CategoryId);
-                if (checkCategory != null)
+            using (var transaction = await _unitOfWork.BeginTransactionAsync()) {
+                try
                 {
-                    var product = _mapper.Map<Product>(productVIew);
-                    product.Status = 1;
-                    await _unitOfWork.ProductRepository.InsertAsync(product);
-                    await _unitOfWork.SaveAsync();
-                    status = true;
-                    return status;
+                    bool status = false;
+                    var checkCategory = _unitOfWork.CategoryRepository.GetByIDAsync(product.CategoryId);
+                    if (checkCategory != null)
+                    {
+                        product.Status = 1;
+                        await _unitOfWork.ProductRepository.InsertAsync(product);
+                        await _unitOfWork.SaveAsync();
+
+                        if (imagePaths.Any())
+                        {
+                            foreach (var imagePath in imagePaths)
+                            {
+                                if (!String.IsNullOrEmpty(imagePath))
+                                {
+                                    var image = new ProductImage
+                                    {
+                                        ProductId = product.ProductId,
+                                        ImagePath = imagePath
+                                    };
+                                    await _unitOfWork.ProductImageRepository.InsertAsync(image);
+                                    await _unitOfWork.SaveAsync();
+                                }
+                            }
+                        }
+
+                        status = true;
+                        await transaction.CommitAsync();
+                        return status;
+                    }
+                    else
+                    {
+                        return status;
+                    }
+
                 }
-                else
+                catch (Exception ex)
                 {
-                    return status;
+                    await transaction.RollbackAsync();
+                    throw new Exception(ex.Message);
                 }
-                
-            }catch(Exception ex)
-            {
-                throw new Exception(ex.Message);
             }
         }
 
-        public async Task<List<ProductVIew>> GetAllProducts(int CategoryId)
+        public async Task<List<ProductDtoResponse>> GetAllProducts(int CategoryId)
         {
             try
             {
@@ -61,11 +85,20 @@ namespace RolexApplication_BAL.Service.Implement
                 }
                 if (products.Any())
                 {
-                    List<ProductVIew> list = new List<ProductVIew>();
+                    List<ProductDtoResponse> list = new List<ProductDtoResponse>();
                     foreach (var product in products)
                     {
-                        var productVIew = _mapper.Map<ProductVIew>(product);
-                        list.Add(productVIew);
+                        var productView = _mapper.Map<ProductDtoResponse>(product);
+                        var productImages = (await _unitOfWork.ProductImageRepository.GetAsync(p => p.ProductId == product.ProductId)).FirstOrDefault();
+                        if (productImages != null)
+                        {
+                            var imageView = new ProductImageView
+                            {
+                                Base64StringImage = productImages.ImagePath
+                            };
+                            productView.Images.Add(imageView);
+                        }
+                        list.Add(productView);
                     }
                     return list;
                 }
@@ -81,14 +114,25 @@ namespace RolexApplication_BAL.Service.Implement
 
         }
 
-        public async Task<ProductVIew> GetProductByID(int id)
+        public async Task<ProductDtoResponse> GetProductByID(int id)
         {
             try
             {
                 var product = (await _unitOfWork.ProductRepository.GetAsync(filter: p => p.ProductId == id, includeProperties: "Category")).FirstOrDefault();
                 if (product != null)
                 {
-                    var productView = _mapper.Map<ProductVIew>(product);
+                    var productView = _mapper.Map<ProductDtoResponse>(product);
+                    var productImages = await _unitOfWork.ProductImageRepository.GetAsync(p => p.ProductId == product.ProductId);
+                    if (productImages.Any()) {
+                        foreach (var image in productImages)
+                        {
+                            var imageView = new ProductImageView
+                            {
+                                Base64StringImage = image.ImagePath
+                            };
+                            productView.Images.Add(imageView);
+                        }
+                    }
                     return productView;
                 }
                 else
@@ -145,37 +189,72 @@ namespace RolexApplication_BAL.Service.Implement
             
         }
 
-        public async Task<bool> UpdateProduct(ProductDtoRequest request, int id)
+        public async Task<(bool check, List<string>? oldImagePaths)> UpdateProduct(ProductDtoRequest request, List<string> imagePaths, int id)
         {
-            try
+            using (var transaction = await _unitOfWork.BeginTransactionAsync())
             {
-                bool status = false;
-                var checkCategory = _unitOfWork.CategoryRepository.GetByIDAsync(request.CategoryId);
-                if (checkCategory != null)
+                try
                 {
-                    var checkProduct = await _unitOfWork.ProductRepository.GetByIDAsync(id);
-                    if (checkProduct != null)
+                    bool status = false;
+                    var checkCategory = _unitOfWork.CategoryRepository.GetByIDAsync(request.CategoryId);
+                    if (checkCategory != null)
                     {
-                        _mapper.Map(request, checkProduct);
-                        await _unitOfWork.ProductRepository.UpdateAsync(checkProduct);
-                        await _unitOfWork.SaveAsync();
-                        status = true;
-                        return status;
+                        var checkProduct = await _unitOfWork.ProductRepository.GetByIDAsync(id);
+                        if (checkProduct != null)
+                        {
+                            var product = _mapper.Map(request, checkProduct);
+                            await _unitOfWork.ProductRepository.UpdateAsync(product);
+                            await _unitOfWork.SaveAsync();
+                            var currentImagePaths = new List<string>();
+
+                            var currentImages = await _unitOfWork.ProductImageRepository.GetAsync(p => p.ProductId == checkProduct.ProductId);
+                            if (currentImages.Any())
+                            {
+                                foreach (var image in currentImages)
+                                {
+                                    await _unitOfWork.ProductImageRepository.DeleteAsync(image);
+                                    await _unitOfWork.SaveAsync();
+                                    currentImagePaths.Add(image.ImagePath);
+                                }
+                            }
+
+                            if (imagePaths.Any())
+                            {
+                                foreach (var imagePath in imagePaths)
+                                {
+                                    if (!String.IsNullOrEmpty(imagePath))
+                                    {
+                                        var image = new ProductImage
+                                        {
+                                            ProductId = checkProduct.ProductId,
+                                            ImagePath = imagePath
+                                        };
+                                        await _unitOfWork.ProductImageRepository.InsertAsync(image);
+                                        await _unitOfWork.SaveAsync();
+                                    }
+                                }
+                            }
+
+                            status = true;
+                            await transaction.CommitAsync();
+                            return (status, currentImagePaths);
+                        }
+                        else
+                        {
+                            return (status, null);
+                        }
                     }
                     else
                     {
-                        return status;
+                        return (status, null);
                     }
-                }
-                else
-                {
-                    return status;
-                }
 
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception(ex.Message);
+                }
             }
         }
     }
