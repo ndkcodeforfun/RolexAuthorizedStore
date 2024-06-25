@@ -19,5 +19,7 @@ namespace RolexApplication_BAL.Service.Interface
         Task<(bool check, List<string>? oldImagePaths)> UpdateProduct(ProductDtoRequest request, List<string> imagePaths, int id);
 
         Task<int> StatusProduct(int id);
+
+        Task<List<ProductDtoResponse>> Search(string searchInput);
     }
 }

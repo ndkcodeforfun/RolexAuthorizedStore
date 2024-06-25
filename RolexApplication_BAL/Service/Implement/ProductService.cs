@@ -146,6 +146,41 @@ namespace RolexApplication_BAL.Service.Implement
             
         }
 
+        public async Task<List<ProductDtoResponse>> Search(string searchInput)
+        {
+            try
+            {
+                var products = (await _unitOfWork.ProductRepository.FindAsync(p => searchInput != null && p.Name.Contains(searchInput))).ToList();
+                if (products.Any())
+                {
+                    List<ProductDtoResponse> list = new List<ProductDtoResponse>();
+                    foreach (var product in products)
+                    {
+                        var productView = _mapper.Map<ProductDtoResponse>(product);
+                        var productImages = (await _unitOfWork.ProductImageRepository.GetAsync(p => p.ProductId == product.ProductId)).FirstOrDefault();
+                        if (productImages != null)
+                        {
+                            var imageView = new ProductImageView
+                            {
+                                Base64StringImage = productImages.ImagePath
+                            };
+                            productView.Images.Add(imageView);
+                        }
+                        list.Add(productView);
+                    }
+                    return list;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception();
+            }
+        }
+
         public async Task<int> StatusProduct(int id)
         {
             try

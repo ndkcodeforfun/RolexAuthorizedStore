@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RolexApplication_Backend.Controllers;
 using RolexApplication_BAL.ModelView;
 using RolexApplication_DAL.Models;
 using System;
@@ -22,7 +23,8 @@ namespace RolexApplication_BAL.Mapper
             CreateMap<CartItem, CartItemDtoResponse>().ReverseMap();
             CreateMap<ChatRequest, MessageDtoRequest>().ReverseMap();
             CreateMap<ChatRequest, MessageDtoResponse>().ReverseMap();
-
+            CreateMap<Order, OrderDtoResponse>().ReverseMap();
+            CreateMap<OrderDetail, OrderDetailDtoResponse>().ReverseMap();
         }
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RolexApplication_BAL.ModelView;
 using RolexApplication_BAL.Service.Interface;
+using RolexApplication_DAL.Models;
 
 namespace RolexApplication_Backend.Controllers
 {
@@ -43,6 +44,79 @@ namespace RolexApplication_Backend.Controllers
                 }
             }
             catch (Exception ex) { 
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("admin")]
+        public async Task<IActionResult> GetAllOrdersForAdmin()
+        {
+            try
+            {
+                var response = await _orderService.GetAllOrders();
+                if (!response.Any()) { 
+                    return NotFound("No order in history");
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("{CustomerId}")]
+        public async Task<IActionResult> GetOrdersByCustomerId(int CustomerId)
+        {
+            try
+            {
+                var response = await _orderService.GetOrdersByCustomerId(CustomerId);
+                if (!response.Any())
+                {
+                    return NotFound("No order in history");
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpGet("detail/{id}")]
+        public async Task<IActionResult> GetOrderById(int id)
+        {
+            try
+            {
+                var response = await _orderService.GetOrderById(id);
+                if (response == null)
+                {
+                    return NotFound("No order in history");
+                }
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+        [HttpPut("")]
+        public async Task<IActionResult> UpdateOrderStatus([FromQuery] int id, int status)
+        {
+            try
+            {
+                var order = await _orderService._getOrderById(id);
+                if(order == null)
+                {
+                    return NotFound("Order not found");
+                }
+                order.Status = status;
+                await _orderService.UpdateOrderStatus(order);
+                return Ok("Update success");
+            }
+            catch (Exception ex) 
+            { 
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using RolexApplication_Backend.Controllers;
 using RolexApplication_BAL.ModelView;
 using RolexApplication_BAL.Service.Interface;
 using RolexApplication_DAL.Models;
@@ -97,6 +98,107 @@ namespace RolexApplication_BAL.Service.Implement
             }
         }
 
+        public async Task<List<OrderDtoResponse>> GetAllOrders()
+        {
+            try
+            {
+                var response = new List<OrderDtoResponse>();
+                var orders = await _unitOfWork.OrderRepository.GetAsync();
+                if (orders.Any())
+                {
+                    foreach (var order in orders)
+                    {
+                        var orderView = _mapper.Map<OrderDtoResponse>(order);
+                        var orderDetails = await _unitOfWork.OrderDetailRepository.GetAsync(o => o.OrderId == orderView.OrderId);
+                        if (orderDetails.Any())
+                        {
+                            foreach(var item in orderDetails)
+                            {
+                                var od = _mapper.Map<OrderDetailDtoResponse>(item);
+                                orderView.OrderDetails.Add(od);
+                            }
+                        }
+                        response.Add(orderView);
+                    }
+                }
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<OrderDtoResponse?> GetOrderById(int id)
+        {
+            try
+            {
+                var order = await _unitOfWork.OrderRepository.GetByIDAsync(id);
+                if (order != null)
+                {
+                    var orderView = _mapper.Map<OrderDtoResponse>(order);
+                    var orderDetails = await _unitOfWork.OrderDetailRepository.GetAsync(o => o.OrderId == orderView.OrderId);
+                    if (orderDetails.Any())
+                    {
+                        foreach (var item in orderDetails)
+                        {
+                            var od = _mapper.Map<OrderDetailDtoResponse>(item);
+                            orderView.OrderDetails.Add(od);
+                        }
+                    }
+                    return orderView;
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<OrderDtoResponse>> GetOrdersByCustomerId(int CustomerId)
+        {
+            try
+            {
+                var response = new List<OrderDtoResponse>();
+                var orders = await _unitOfWork.OrderRepository.GetAsync(filter: o => o.CustomerId == CustomerId);
+                if (orders.Any())
+                {
+                    foreach (var order in orders)
+                    {
+                        var orderView = _mapper.Map<OrderDtoResponse>(order);
+                        var orderDetails = await _unitOfWork.OrderDetailRepository.GetAsync(o => o.OrderId == orderView.OrderId);
+                        if (orderDetails.Any())
+                        {
+                            foreach (var item in orderDetails)
+                            {
+                                var od = _mapper.Map<OrderDetailDtoResponse>(item);
+                                orderView.OrderDetails.Add(od);
+                            }
+                        }
+                        response.Add(orderView);
+                    }
+                }
+                return response;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task UpdateOrderStatus(Order order)
+        {
+            try
+            {
+                await _unitOfWork.OrderRepository.UpdateAsync(order);
+                await _unitOfWork.SaveAsync();
+            } catch (Exception ex) 
+            { 
+                throw new Exception(ex.Message); 
+            }
+        }
+
         public async Task<int> ValidateItemInCart(List<OrderProductDto> cartItems)
         {
             try
@@ -125,6 +227,24 @@ namespace RolexApplication_BAL.Service.Implement
             }
             catch (Exception ex)
             {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<Order?> _getOrderById(int id)
+        {
+            try
+            {
+                var order = await _unitOfWork.OrderRepository.GetByIDAsync(id);
+                if(order == null)
+                {
+                    return null;
+                } else
+                {
+                    return order;
+                }
+            }
+            catch (Exception ex) { 
                 throw new Exception(ex.Message);
             }
         }

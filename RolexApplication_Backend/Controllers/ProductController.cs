@@ -126,6 +126,42 @@ namespace RolexApplication_Backend.Controllers
             }
         }
 
+        [HttpGet("/api/v1/product/search/{searchInput}")]
+        public async Task<IActionResult> SearchProduct(string searchInput)
+        {
+            try
+            {
+                var products = await _productService.Search(searchInput);
+                if (products != null)
+                {
+                    foreach (var product in products)
+                    {
+                        if (product.Images.Any())
+                        {
+                            foreach (var image in product.Images)
+                            {
+                                var imagePath = Path.Combine(_imagesDirectory, image.Base64StringImage);
+                                if (System.IO.File.Exists(imagePath))
+                                {
+                                    byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+                                    image.Base64StringImage = Convert.ToBase64String(imageBytes);
+                                }
+                            }
+                        }
+                    }
+                    return Ok(products);
+                }
+                else
+                {
+                    return NotFound("No result");
+                }
+            }
+            catch (Exception ex) { 
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
+
+
         [HttpPut("/api/v1/product/{id}")]
         public async Task<IActionResult> UpdateProduct([FromBody] ProductDtoRequest productView, int id)
         {
