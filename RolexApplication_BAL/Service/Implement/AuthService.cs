@@ -51,7 +51,7 @@ namespace RolexApplication_BAL.Service.Implement
                 var accessClaims = new List<Claim>
                 {
                     new Claim("CustomerId", customer.CustomerId.ToString()),
-                    new Claim("Role", "ADMIN")
+                    new Claim("Role", "CUSTOMER")
                 };
                 var accessExpiration = DateTime.Now.AddMinutes(30);
                 var accessJwt = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], accessClaims, expires: accessExpiration, signingCredentials: credentials);
