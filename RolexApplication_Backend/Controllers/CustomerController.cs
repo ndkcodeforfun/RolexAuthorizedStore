@@ -58,10 +58,10 @@ namespace RolexApplication_Backend.Controllers
         {
             try
             {
-                if (request == null)
-                {
-                    return BadRequest("Customer information cannot empty");
-                }
+                //if (request == null)
+                //{
+                //    return BadRequest("Customer information cannot empty");
+                //}
                 if (request.Email.IsNullOrEmpty() || request.Password.IsNullOrEmpty())
                 {
                     return BadRequest("Please fill at least email and password fields");
