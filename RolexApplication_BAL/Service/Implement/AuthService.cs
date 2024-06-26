@@ -42,7 +42,7 @@ namespace RolexApplication_BAL.Service.Implement
             }
         }
 
-        public async Task<string> GenerateAccessToken(string email)
+        public async Task<string> GenerateAccessTokenForCustomer(Customer customer)
         {
             try
             {
@@ -50,7 +50,29 @@ namespace RolexApplication_BAL.Service.Implement
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
                 var accessClaims = new List<Claim>
                 {
-                    new Claim("Email", email)
+                    new Claim("CustomerId", customer.CustomerId.ToString()),
+                    new Claim("Role", "ADMIN")
+                };
+                var accessExpiration = DateTime.Now.AddMinutes(30);
+                var accessJwt = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], accessClaims, expires: accessExpiration, signingCredentials: credentials);
+                var accessToken = new JwtSecurityTokenHandler().WriteToken(accessJwt);
+                return accessToken;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<string> GenerateAccessTokenForAdmin()
+        {
+            try
+            {
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+                var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+                var accessClaims = new List<Claim>
+                {
+                    new Claim("Role", "ADMIN")
                 };
                 var accessExpiration = DateTime.Now.AddMinutes(30);
                 var accessJwt = new JwtSecurityToken(_configuration["Jwt:Issuer"], _configuration["Jwt:Audience"], accessClaims, expires: accessExpiration, signingCredentials: credentials);

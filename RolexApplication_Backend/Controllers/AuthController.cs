@@ -35,14 +35,14 @@ namespace RolexApplication_Backend.Controllers
                 var hashedPassword = await HashPassword(password);
                 if (AdminEmail.Equals(email) && AdminPassword.Equals(hashedPassword))
                 {
-                    var accessToken = await _authService.GenerateAccessToken(AdminEmail);
+                    var accessToken = await _authService.GenerateAccessTokenForAdmin();
                     response = Ok(new { accessToken = accessToken });
                     return response;
                 }
                 var customer = await _authService.AuthenticateCustomer(email, hashedPassword);
                 if (customer != null)
                 {
-                    var accessToken = await _authService.GenerateAccessToken(customer.Email);
+                    var accessToken = await _authService.GenerateAccessTokenForCustomer(customer);
                     response = Ok(new { accessToken = accessToken });
                     return response;
                 }

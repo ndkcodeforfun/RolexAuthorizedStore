@@ -11,6 +11,7 @@ namespace RolexApplication_BAL.Service.Interface
     {
         Task<Customer?> AuthenticateCustomer(string email, string hashedPassword);
 
-        Task<string> GenerateAccessToken(string email);
+        Task<string> GenerateAccessTokenForCustomer(Customer customer);
+        Task<string> GenerateAccessTokenForAdmin();
     }
 }
