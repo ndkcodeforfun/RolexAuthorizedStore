@@ -12,10 +12,12 @@ namespace RolexApplication_Backend.Controllers
     public class CartItemController : ControllerBase
     {
         private readonly ICartItemService _cartItemService;
+        private readonly string _imagesDirectory;
 
-        public CartItemController(ICartItemService cartItemService)
+        public CartItemController(ICartItemService cartItemService, IWebHostEnvironment env)
         {
             _cartItemService = cartItemService;
+            _imagesDirectory = Path.Combine(env.ContentRootPath, "img", "product");
         }
 
         [HttpPost]
@@ -51,6 +53,21 @@ namespace RolexApplication_Backend.Controllers
                 if (!response.Any())
                 {
                     return NotFound("No item in your cart");
+                }
+                foreach (var item in response)
+                {
+                    if (item.ProductVIew.Images.Any())
+                    {
+                        foreach (var image in item.ProductVIew.Images)
+                        {
+                            var imagePath = Path.Combine(_imagesDirectory, image.Base64StringImage);
+                            if (System.IO.File.Exists(imagePath))
+                            {
+                                byte[] imageBytes = System.IO.File.ReadAllBytes(imagePath);
+                                image.Base64StringImage = Convert.ToBase64String(imageBytes);
+                            }
+                        }
+                    }
                 }
                 return Ok(response);
             }

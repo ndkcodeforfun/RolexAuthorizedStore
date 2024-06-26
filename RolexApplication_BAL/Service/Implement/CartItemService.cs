@@ -84,6 +84,15 @@ namespace RolexApplication_BAL.Service.Implement
                 {
                     var itemView = _mapper.Map<CartItemDtoResponse>(item);
                     itemView.ProductVIew = _mapper.Map<ProductDtoResponse>(item.Product);
+                    var productImages = (await _unitOfWork.ProductImageRepository.GetAsync(p => p.ProductId == item.Product.ProductId)).FirstOrDefault();
+                    if (productImages != null)
+                    {
+                        var imageView = new ProductImageView
+                        {
+                            Base64StringImage = productImages.ImagePath
+                        };
+                        itemView.ProductVIew.Images.Add(imageView);
+                    }
                     response.Add(itemView);
                 }
                 return response;

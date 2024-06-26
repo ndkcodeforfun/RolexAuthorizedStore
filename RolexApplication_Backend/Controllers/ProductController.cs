@@ -97,7 +97,7 @@ namespace RolexApplication_Backend.Controllers
             }
             else
             {
-                return BadRequest("Products not avaiable");
+                return NotFound("Products not avaiable");
             }
         }
 
