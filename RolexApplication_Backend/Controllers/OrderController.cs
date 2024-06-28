@@ -17,7 +17,7 @@ namespace RolexApplication_Backend.Controllers
             _orderService = orderService;
         }
 
-        [HttpPost]
+        [HttpPost("/api/v1/createOrder")]
         public async Task<IActionResult> CreateOrder(List<OrderProductDto> cartItems)
         {
             try
@@ -48,7 +48,7 @@ namespace RolexApplication_Backend.Controllers
             }
         }
 
-        [HttpGet("admin")]
+        [HttpGet("/api/v1/admin")]
         public async Task<IActionResult> GetAllOrdersForAdmin()
         {
             try
@@ -65,7 +65,7 @@ namespace RolexApplication_Backend.Controllers
             }
         }
 
-        [HttpGet("{CustomerId}")]
+        [HttpGet("/api/v1/{CustomerId}")]
         public async Task<IActionResult> GetOrdersByCustomerId(int CustomerId)
         {
             try
@@ -83,7 +83,7 @@ namespace RolexApplication_Backend.Controllers
             }
         }
 
-        [HttpGet("detail/{id}")]
+        [HttpGet("/api/v1/detail/{id}")]
         public async Task<IActionResult> GetOrderById(int id)
         {
             try
@@ -101,7 +101,7 @@ namespace RolexApplication_Backend.Controllers
             }
         }
 
-        [HttpPut("")]
+        [HttpPut("/api/v1/updateStatus")]
         public async Task<IActionResult> UpdateOrderStatus([FromQuery] int id, int status)
         {
             try
