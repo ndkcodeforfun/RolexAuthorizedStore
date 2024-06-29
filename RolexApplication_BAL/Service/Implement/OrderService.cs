@@ -168,12 +168,19 @@ namespace RolexApplication_BAL.Service.Implement
                     {
                         var orderView = _mapper.Map<OrderDtoResponse>(order);
                         var orderDetails = await _unitOfWork.OrderDetailRepository.GetAsync(o => o.OrderId == orderView.OrderId);
+
                         if (orderDetails.Any())
                         {
                             foreach (var item in orderDetails)
                             {
-                                var od = _mapper.Map<OrderDetailDtoResponse>(item);
-                                orderView.OrderDetails.Add(od);
+                                // Get product name from the ProductRepository
+                                var product = await _unitOfWork.ProductRepository.GetByIDAsync(item.ProductId);
+                                if (product != null)
+                                {
+                                    var od = _mapper.Map<OrderDetailDtoResponse>(item);
+                                    od.ProductName = product.Name;  // Set product name
+                                    orderView.OrderDetails.Add(od);
+                                }
                             }
                         }
                         response.Add(orderView);
@@ -186,6 +193,7 @@ namespace RolexApplication_BAL.Service.Implement
                 throw new Exception(ex.Message);
             }
         }
+
 
         public async Task UpdateOrderStatus(Order order)
         {
