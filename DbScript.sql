@@ -70,6 +70,9 @@ create table Orders (
 	OrderId INT IDENTITY(1,1) PRIMARY KEY,
 	CustomerId INT NOT NULL,
 	TotalPrice decimal(13,2),
+	TransactionCode NVARCHAR(256),
+	OrderDate DATETIME NOT NULL, 
+	ExpiredDate DATETIME NOT NULL,
 	Status INT NOT NULL,
 	CONSTRAINT FK_CustomerId_Orders FOREIGN KEY (CustomerId) REFERENCES Customers(CustomerId),
 )
@@ -92,5 +95,21 @@ create table ChatRequest (
 	Content NVARCHAR(MAX),
 	SendTime DATETIME,
 	Status INT NOT NULL
+)
+GO
+
+create table Payments (
+	PaymentId INT IDENTITY(1,1) PRIMARY KEY,
+	PaymentMethod NVARCHAR(100) NOT NULL,
+	BankCode NVARCHAR(MAX) NOT NULL,
+	BankTranNo NVARCHAR(MAX) NOT NULL,
+	CardType NVARCHAR(MAX) NOT NULL,
+	PaymentInfo NVARCHAR(MAX),
+	PayDate DATETIME,
+	TransactionNo NVARCHAR(MAX) NOT NULL,
+	TransactionStatus INT NOT NULL,
+	PaymentAmount DECIMAL(13,2) NOT NULL,
+	OrderId INT,
+	CONSTRAINT FK_OrderId_Payments FOREIGN KEY (OrderId) REFERENCES Orders(OrderId)
 )
 GO

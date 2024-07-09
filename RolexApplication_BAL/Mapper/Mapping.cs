@@ -25,6 +25,7 @@ namespace RolexApplication_BAL.Mapper
             CreateMap<ChatRequest, MessageDtoResponse>().ReverseMap();
             CreateMap<Order, OrderDtoResponse>().ReverseMap();
             CreateMap<OrderDetail, OrderDetailDtoResponse>().ReverseMap();
+            CreateMap<Payment, PaymentResponse>().ReverseMap();
         }
     }
 }

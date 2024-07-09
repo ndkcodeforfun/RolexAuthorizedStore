@@ -22,6 +22,7 @@ namespace RolexApplication_DAL.Models
         public virtual DbSet<Customer> Customers { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
         public virtual DbSet<OrderDetail> OrderDetails { get; set; } = null!;
+        public virtual DbSet<Payment> Payments { get; set; } = null!;
         public virtual DbSet<Product> Products { get; set; } = null!;
         public virtual DbSet<ProductImage> ProductImages { get; set; } = null!;
 
@@ -39,7 +40,7 @@ namespace RolexApplication_DAL.Models
             modelBuilder.Entity<CartItem>(entity =>
             {
                 entity.HasKey(e => e.ItemId)
-                    .HasName("PK__CartItem__727E838B2C37447A");
+                    .HasName("PK__CartItem__727E838B59968241");
 
                 entity.HasOne(d => d.Customer)
                     .WithMany(p => p.CartItems)
@@ -62,7 +63,7 @@ namespace RolexApplication_DAL.Models
             modelBuilder.Entity<ChatRequest>(entity =>
             {
                 entity.HasKey(e => e.MessageId)
-                    .HasName("PK__ChatRequ__C87C0C9CB878802B");
+                    .HasName("PK__ChatRequ__C87C0C9C7F2B86B2");
 
                 entity.ToTable("ChatRequest");
 
@@ -86,7 +87,13 @@ namespace RolexApplication_DAL.Models
 
             modelBuilder.Entity<Order>(entity =>
             {
+                entity.Property(e => e.ExpiredDate).HasColumnType("datetime");
+
+                entity.Property(e => e.OrderDate).HasColumnType("datetime");
+
                 entity.Property(e => e.TotalPrice).HasColumnType("decimal(13, 2)");
+
+                entity.Property(e => e.TransactionCode).HasMaxLength(256);
 
                 entity.HasOne(d => d.Customer)
                     .WithMany(p => p.Orders)
@@ -112,6 +119,20 @@ namespace RolexApplication_DAL.Models
                     .HasConstraintName("FK_ProductId_OrderDetails");
             });
 
+            modelBuilder.Entity<Payment>(entity =>
+            {
+                entity.Property(e => e.PayDate).HasColumnType("datetime");
+
+                entity.Property(e => e.PaymentAmount).HasColumnType("decimal(13, 2)");
+
+                entity.Property(e => e.PaymentMethod).HasMaxLength(100);
+
+                entity.HasOne(d => d.Order)
+                    .WithMany(p => p.Payments)
+                    .HasForeignKey(d => d.OrderId)
+                    .HasConstraintName("FK_OrderId_Payments");
+            });
+
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.Property(e => e.Name).HasMaxLength(255);
@@ -128,7 +149,7 @@ namespace RolexApplication_DAL.Models
             modelBuilder.Entity<ProductImage>(entity =>
             {
                 entity.HasKey(e => e.ImageId)
-                    .HasName("PK__ProductI__7516F70C5119A635");
+                    .HasName("PK__ProductI__7516F70C7BD8E3C0");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.ProductImages)
