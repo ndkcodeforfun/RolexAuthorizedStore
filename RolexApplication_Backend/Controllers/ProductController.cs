@@ -77,9 +77,10 @@ namespace RolexApplication_Backend.Controllers
         public async Task<IActionResult> GetAllProduct([FromQuery] int CategoryId)
         {
             var products = await _productService.GetAllProducts(CategoryId);
-            if(products != null)
+            if (products != null)
             {
-                foreach (var product in products) {
+                foreach (var product in products)
+                {
                     if (product.Images.Any())
                     {
                         foreach (var image in product.Images)
@@ -105,11 +106,12 @@ namespace RolexApplication_Backend.Controllers
         public async Task<IActionResult> GetProductById(int id)
         {
             var product = await _productService.GetProductByID(id);
-            if(product != null)
+            if (product != null)
             {
                 if (product.Images.Any())
                 {
-                    foreach (var image in product.Images) {
+                    foreach (var image in product.Images)
+                    {
                         var imagePath = Path.Combine(_imagesDirectory, image.Base64StringImage);
                         if (System.IO.File.Exists(imagePath))
                         {
@@ -156,7 +158,8 @@ namespace RolexApplication_Backend.Controllers
                     return NotFound("No result");
                 }
             }
-            catch (Exception ex) { 
+            catch (Exception ex)
+            {
                 return StatusCode(500, $"Internal Server Error: {ex.Message}");
             }
         }
@@ -193,7 +196,8 @@ namespace RolexApplication_Backend.Controllers
                 }
             }
             var checkSuccess = await _productService.UpdateProduct(productView, imagePaths, id);
-            if (checkSuccess.check && checkSuccess.oldImagePaths != null) {
+            if (checkSuccess.check && checkSuccess.oldImagePaths != null)
+            {
                 if (checkSuccess.oldImagePaths.Any())
                 {
                     foreach (var oldImagePath in checkSuccess.oldImagePaths)
@@ -224,8 +228,9 @@ namespace RolexApplication_Backend.Controllers
             {
                 return Ok("Update successful");
             }
-            
-            else if (check == 2) {
+
+            else if (check == 2)
+            {
                 return BadRequest("This product is currently out of stock, please update quantity first");
             }
             else
@@ -234,5 +239,23 @@ namespace RolexApplication_Backend.Controllers
             }
         }
 
+        [HttpDelete("/api/v1/product/{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                if(await _productService.DeleteProduct(id))
+                {
+                    return Ok("Delete successfully");
+                } else
+                {
+                    return BadRequest("Product does not exist");
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
+        }
     }
 }

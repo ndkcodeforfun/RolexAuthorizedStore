@@ -21,5 +21,7 @@ namespace RolexApplication_BAL.Service.Interface
         Task<int> StatusProduct(int id);
 
         Task<List<ProductDtoResponse>> Search(string searchInput);
+
+        Task<bool> DeleteProduct(int id);
     }
 }

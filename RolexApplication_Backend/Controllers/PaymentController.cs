@@ -21,11 +21,26 @@ namespace RolexApplication_Backend.Controllers
         {
             try
             {
-                if (parameters.vnp_BankTranNo == null) {
-                    return BadRequest("Cancelled transaction");
+                string appScheme = "rolexauthorizedstore";
+
+                if (parameters.vnp_BankTranNo == null)
+                {
+                    string redirectUrl = $"{appScheme}://payment-failed?orderId={parameters.vnp_TxnRef}";
+
+                    return Redirect(redirectUrl);
                 }
                 var result = await _paymentService.CreatePayment(parameters);
-                return result != null ? Ok(result) : NotFound("Order does not created");
+
+                if (result != null)
+                {
+                    string redirectUrl = $"{appScheme}://payment-success?status={result.TransactionStatus}&orderId={result.OrderId}";
+
+                    return Redirect(redirectUrl);
+                }
+                else
+                {
+                    return NotFound("Order does not created");
+                }
             }
             catch (Exception ex)
             {

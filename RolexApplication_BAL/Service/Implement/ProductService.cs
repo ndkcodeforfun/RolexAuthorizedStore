@@ -71,6 +71,40 @@ namespace RolexApplication_BAL.Service.Implement
             }
         }
 
+        public async Task<bool> DeleteProduct(int id)
+        {
+            using (var transaction = await _unitOfWork.BeginTransactionAsync()) {
+                try
+                {
+                    var checkProduct = await _unitOfWork.ProductRepository.GetByIDAsync(id);
+                    if (checkProduct != null)
+                    {
+                        var Images = (await _unitOfWork.ProductImageRepository.GetAsync(p => p.ProductId == checkProduct.ProductId)).ToList();
+                        if (Images.Any())
+                        {
+                            foreach (var image in Images) { 
+                                await _unitOfWork.ProductImageRepository.DeleteAsync(image);
+                                await _unitOfWork.SaveAsync();
+                            }
+                        }
+                        await _unitOfWork.ProductRepository.DeleteAsync(checkProduct);
+                        await _unitOfWork.SaveAsync();
+                        await transaction.CommitAsync();
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    throw new Exception(ex.Message);
+                }
+            }
+        }
+
         public async Task<List<ProductDtoResponse>> GetAllProducts(int CategoryId)
         {
             try
