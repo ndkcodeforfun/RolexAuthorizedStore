@@ -80,26 +80,27 @@ namespace RolexApplication_Backend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCustomerInformation([FromBody] CustomerDtoRequest request, int id)
+        public async Task<IActionResult> UpdateCustomerInformation([FromBody] UpdateCustomerDtoRequest request, int id)
         {
             try
             {
                 if (request == null)
                 {
-                    return BadRequest("Customer information cannot empty");
+                    return BadRequest(new { success = false, message = "Customer information cannot be empty" });
                 }
-                if (request.DoB == null || request.Address.IsNullOrEmpty() || request.Name.IsNullOrEmpty() || request.Phone.IsNullOrEmpty())
+                if (string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.Address) || string.IsNullOrEmpty(request.Phone) || request.DoB == null)
                 {
-                    return BadRequest("Please fill all fields");
+                    return BadRequest(new { success = false, message = "Please fill all fields" });
                 }
                 await _customerService.UpdateCustomerInformation(id, request);
-                return Ok("Update information success");
+                return Ok(new { success = true, message = "Update information success" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                return StatusCode(500, new { success = false, message = $"Internal Server Error: {ex.Message}" });
             }
         }
+
 
         [HttpPut("status")]
         public async Task<IActionResult> UpdateCustomerStatus([FromQuery] int id, [FromQuery] int status)

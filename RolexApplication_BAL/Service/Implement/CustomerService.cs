@@ -97,7 +97,7 @@ namespace RolexApplication_BAL.Service.Implement
             }
         }
 
-        public async Task UpdateCustomerInformation(int CustomerId, CustomerDtoRequest request)
+        public async Task UpdateCustomerInformation(int CustomerId, UpdateCustomerDtoRequest request)
         {
             try
             {

@@ -18,7 +18,7 @@ namespace RolexApplication_BAL.Service.Interface
 
         Task CreateCustomerAccount (CustomerDtoRequest request);
 
-        Task UpdateCustomerInformation (int CustomerId, CustomerDtoRequest request);
+        Task UpdateCustomerInformation (int CustomerId, UpdateCustomerDtoRequest request);
 
         Task UpdateCustomerStatus(int CustomerId, int status);
     }
