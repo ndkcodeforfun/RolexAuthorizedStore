@@ -24,7 +24,7 @@ namespace DAL.UnitOfWork.Implement
         private GenericRepository<OrderDetail> _orderDetailRepository;
         private GenericRepository<Product> _productRepository;
         private GenericRepository<ProductImage> _productImageRepository;
-
+        private GenericRepository<Payment> _paymentRepository;
 
         public UnitOfWork(RolexAuthorizedStoreDbContext context)
         {
@@ -47,6 +47,8 @@ namespace DAL.UnitOfWork.Implement
         public IGenericRepository<ProductImage> ProductImageRepository => _productImageRepository ?? new GenericRepository<ProductImage>(context);
 
         public IGenericRepository<ChatRequest> ChatRequestRepository => _chatRequestRepository ?? new GenericRepository<ChatRequest>(context);
+
+        public IGenericRepository<Payment> PaymentRepository => _paymentRepository ?? new GenericRepository<Payment>(context);
 
         protected virtual void Dispose(bool disposing)
         {

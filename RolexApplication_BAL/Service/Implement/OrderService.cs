@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using RolexApplication_Backend.Controllers;
 using RolexApplication_BAL.ModelView;
 using RolexApplication_BAL.Service.Interface;
+using RolexApplication_BAL.VNPay;
 using RolexApplication_DAL.Models;
 using RolexApplication_DAL.UnitOfWork.Interface;
 using System;
@@ -16,14 +18,16 @@ namespace RolexApplication_BAL.Service.Implement
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public OrderService(IUnitOfWork unitOfWork, IMapper mapper)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
-        public async Task CreateOrder(List<OrderProductDto> cartItems)
+        public async Task<string> CreateOrder(List<OrderProductDto> cartItems)
         {
             using (var transaction = await _unitOfWork.BeginTransactionAsync()) {
                 try
@@ -49,7 +53,9 @@ namespace RolexApplication_BAL.Service.Implement
                     {
                         CustomerId = customerId,
                         TotalPrice = totalPrice,
-                        Status = 1
+                        Status = 0,
+                        OrderDate = DateTime.Now,
+                        ExpiredDate = DateTime.Now.AddDays(1),
                     };
                     await _unitOfWork.OrderRepository.InsertAsync(order);
                     await _unitOfWork.SaveAsync();
@@ -87,8 +93,9 @@ namespace RolexApplication_BAL.Service.Implement
                         await _unitOfWork.CartItemRepository.DeleteAsync(item);
                         await _unitOfWork.SaveAsync();
                     }
-
+                    var paymentUrl = CreateVnpayLink(order);
                     await transaction.CommitAsync();
+                    return paymentUrl;
                 }
                 catch (Exception ex)
                 {
@@ -208,6 +215,20 @@ namespace RolexApplication_BAL.Service.Implement
             }
         }
 
+        private string CreateVnpayLink(Order order)
+        {
+            var paymentUrl = string.Empty;
+
+            var vpnRequest = new VNPayRequest(_configuration["VNpay:Version"], _configuration["VNpay:tmnCode"],
+                order.OrderDate, "10.87.13.209", (decimal)order.TotalPrice, "VND", "other",
+                $"Thanh toan don hang {order.OrderId}", _configuration["VNpay:ReturnUrl"],
+                $"{order.OrderId}", order.ExpiredDate);
+
+            paymentUrl = vpnRequest.GetLink(_configuration["VNpay:PaymentUrl"],
+                _configuration["VNpay:HashSecret"]);
+
+            return paymentUrl;
+        }
 
         public async Task UpdateOrderStatus(Order order)
         {

@@ -12,7 +12,7 @@ namespace RolexApplication_BAL.Service.Interface
     public interface IOrderService
     {
         Task<int> ValidateItemInCart(List<OrderProductDto> cartItems);
-        Task CreateOrder(List<OrderProductDto> cartItems);
+        Task<string> CreateOrder(List<OrderProductDto> cartItems);
         Task<List<OrderDtoResponse>> GetAllOrders();
         Task<List<OrderDtoResponse>> GetOrdersByCustomerId(int CustomerId);
         Task<OrderDtoResponse?> GetOrderById(int id);

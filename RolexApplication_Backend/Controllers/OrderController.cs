@@ -39,8 +39,8 @@ namespace RolexApplication_Backend.Controllers
                 }
                 else
                 {
-                    await _orderService.CreateOrder(cartItems);
-                    return Ok("Order success");
+                    var url = await _orderService.CreateOrder(cartItems);
+                    return Ok(new { url = url });
                 }
             }
             catch (Exception ex) { 

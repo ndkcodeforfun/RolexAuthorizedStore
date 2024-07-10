@@ -22,6 +22,7 @@ namespace RolexApplication_DAL.UnitOfWork.Interface
 
         IGenericRepository<Product> ProductRepository { get; }
         IGenericRepository<ProductImage> ProductImageRepository { get; }
+        IGenericRepository<Payment> PaymentRepository { get; }
 
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task SaveAsync();
