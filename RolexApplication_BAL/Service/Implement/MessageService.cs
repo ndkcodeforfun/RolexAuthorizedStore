@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Azure.Core;
+using Microsoft.Extensions.Logging;
 using RolexApplication_BAL.ModelView;
 using RolexApplication_BAL.Service.Interface;
 using RolexApplication_DAL.Models;
@@ -7,7 +7,6 @@ using RolexApplication_DAL.UnitOfWork.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace RolexApplication_BAL.Service.Implement
@@ -16,11 +15,13 @@ namespace RolexApplication_BAL.Service.Implement
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ILogger<MessageService> _logger;
 
-        public MessageService(IUnitOfWork unitOfWork, IMapper mapper)
+        public MessageService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<MessageService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<MessageDtoResponse?> GetChatBoxByCustomerId(int customerId)
@@ -30,7 +31,6 @@ namespace RolexApplication_BAL.Service.Implement
                 var customer = await _unitOfWork.CustomerRepository.GetByIDAsync(customerId);
                 if (customer != null)
                 {
-                    List<MessageDtoResponse> response = new List<MessageDtoResponse>();
                     var chatHistory = (await _unitOfWork.ChatRequestRepository.GetAsync(filter: c => c.CustomerId == customerId, orderBy: c => c.OrderByDescending(s => s.SendTime))).FirstOrDefault();
                     if (chatHistory != null)
                     {
@@ -42,6 +42,7 @@ namespace RolexApplication_BAL.Service.Implement
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error in GetChatBoxByCustomerId");
                 throw new Exception(ex.Message);
             }
         }
@@ -73,17 +74,17 @@ namespace RolexApplication_BAL.Service.Implement
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error in GetChatBoxList");
                 throw new Exception(ex.Message);
             }
         }
-
 
         public async Task<(List<MessageDtoResponse>? response, string? CustomerName)> GetChatHistoryByCustomerId(int customerId)
         {
             try
             {
                 var customer = await _unitOfWork.CustomerRepository.GetByIDAsync(customerId);
-                if(customer != null)
+                if (customer != null)
                 {
                     List<MessageDtoResponse> response = new List<MessageDtoResponse>();
                     var chatHistory = await _unitOfWork.ChatRequestRepository.GetAsync(filter: c => c.CustomerId == customerId, orderBy: c => c.OrderBy(s => s.SendTime));
@@ -101,6 +102,7 @@ namespace RolexApplication_BAL.Service.Implement
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error in GetChatHistoryByCustomerId");
                 throw new Exception(ex.Message);
             }
         }
@@ -110,11 +112,13 @@ namespace RolexApplication_BAL.Service.Implement
             try
             {
                 var chatRequest = _mapper.Map<ChatRequest>(request);
+                chatRequest.Status = 1; // Set status to 1
                 await _unitOfWork.ChatRequestRepository.InsertAsync(chatRequest);
                 await _unitOfWork.SaveAsync();
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error in SendMessage");
                 throw new Exception(ex.Message);
             }
         }

@@ -18,16 +18,16 @@ namespace RolexApplication_Backend.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendMessage(MessageDtoRequest request)
+        public async Task<IActionResult> SendMessage([FromBody] MessageDtoRequest request)
         {
             try
             {
                 await _messageService.SendMessage(request);
-                return Ok();
+                return Ok(new { success = true, message = "Message sent successfully" });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+                return StatusCode(500, new { success = false, message = $"Internal Server Error: {ex.Message}" });
             }
         }
 
