@@ -31,6 +31,20 @@ namespace RolexApplication_Backend.Controllers
             }
         }
 
+        [HttpPost("admin")]
+        public async Task<IActionResult> SendMessageAdmin([FromBody] MessageDtoRequest request)
+        {
+            try
+            {
+                await _messageService.SendMessageAdmin(request);
+                return Ok(new { success = true, message = "Message sent successfully" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = $"Internal Server Error: {ex.Message}" });
+            }
+        }
+
         [HttpGet("history/{CustomerId}")]
         public async Task<IActionResult> GetChatHistoryByCustomerId(int CustomerId)
         {

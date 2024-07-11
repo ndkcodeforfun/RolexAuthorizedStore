@@ -92,6 +92,7 @@ GO
 create table ChatRequest (
 	MessageId INT IDENTITY(1,1) PRIMARY KEY,
 	CustomerId INT NOT NULL,
+	Type NVARCHAR(256) NOT NULL,
 	Content NVARCHAR(MAX),
 	SendTime DATETIME,
 	Status INT NOT NULL

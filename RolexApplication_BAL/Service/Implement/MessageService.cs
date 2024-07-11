@@ -112,7 +112,25 @@ namespace RolexApplication_BAL.Service.Implement
             try
             {
                 var chatRequest = _mapper.Map<ChatRequest>(request);
-                chatRequest.Status = 1; // Set status to 1
+                chatRequest.Status = 1;
+                chatRequest.Type = "CUSTOMER";
+                await _unitOfWork.ChatRequestRepository.InsertAsync(chatRequest);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in SendMessage");
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task SendMessageAdmin(MessageDtoRequest request)
+        {
+            try
+            {
+                var chatRequest = _mapper.Map<ChatRequest>(request);
+                chatRequest.Status = 1;
+                chatRequest.Type = "ADMIN";
                 await _unitOfWork.ChatRequestRepository.InsertAsync(chatRequest);
                 await _unitOfWork.SaveAsync();
             }

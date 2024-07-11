@@ -11,6 +11,8 @@ namespace RolexApplication_BAL.Service.Interface
     {
         public Task SendMessage(MessageDtoRequest request);
 
+        public Task SendMessageAdmin(MessageDtoRequest request);
+
         public Task<(List<MessageDtoResponse>? response, string? CustomerName)> GetChatHistoryByCustomerId(int customerId);
 
         public Task<List<MessageListDtoResponse>> GetChatBoxList();

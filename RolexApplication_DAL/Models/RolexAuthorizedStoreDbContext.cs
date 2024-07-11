@@ -40,7 +40,7 @@ namespace RolexApplication_DAL.Models
             modelBuilder.Entity<CartItem>(entity =>
             {
                 entity.HasKey(e => e.ItemId)
-                    .HasName("PK__CartItem__727E838B59968241");
+                    .HasName("PK__CartItem__727E838BF693B9B4");
 
                 entity.HasOne(d => d.Customer)
                     .WithMany(p => p.CartItems)
@@ -63,11 +63,13 @@ namespace RolexApplication_DAL.Models
             modelBuilder.Entity<ChatRequest>(entity =>
             {
                 entity.HasKey(e => e.MessageId)
-                    .HasName("PK__ChatRequ__C87C0C9C7F2B86B2");
+                    .HasName("PK__ChatRequ__C87C0C9C2634263E");
 
                 entity.ToTable("ChatRequest");
 
                 entity.Property(e => e.SendTime).HasColumnType("datetime");
+
+                entity.Property(e => e.Type).HasMaxLength(256);
             });
 
             modelBuilder.Entity<Customer>(entity =>
@@ -149,7 +151,7 @@ namespace RolexApplication_DAL.Models
             modelBuilder.Entity<ProductImage>(entity =>
             {
                 entity.HasKey(e => e.ImageId)
-                    .HasName("PK__ProductI__7516F70C7BD8E3C0");
+                    .HasName("PK__ProductI__7516F70CCBEAE9E3");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.ProductImages)

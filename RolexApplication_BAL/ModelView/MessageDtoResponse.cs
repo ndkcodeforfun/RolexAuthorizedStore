@@ -10,6 +10,7 @@ namespace RolexApplication_BAL.ModelView
     {
         public int MessageId { get; set; }
         public int CustomerId { get; set; }
+        public string Type { get; set; }
         public string? CustomerName { get; set; }
         public string? Content { get; set; }
         public DateTime? SendTime { get; set; }
