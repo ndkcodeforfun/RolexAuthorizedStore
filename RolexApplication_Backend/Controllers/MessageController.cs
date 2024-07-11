@@ -6,7 +6,7 @@ using RolexApplication_BAL.Service.Interface;
 
 namespace RolexApplication_Backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class MessageController : ControllerBase
     {
